@@ -131,6 +131,48 @@ export interface CreateWatchlistInput {
     '@assetType': 'watchlist';
     title: string;
     description?: string;
+    tvShows?: { '@assetType': 'tvShows'; title: string }[];
+}
+
+export interface UpdateWatchlistInput {
+    '@assetType': 'watchlist';
+    title: string;
+    description?: string;
+    tvShows?: { '@assetType': 'tvShows'; title: string }[];
+}
+
+export interface CreateEpisodeInput {
+    '@assetType': 'episodes';
+    season: {
+        '@assetType': 'seasons';
+        number: number;
+        tvShow: { '@assetType': 'tvShows'; title: string };
+    };
+    episodeNumber: number;
+    title: string;
+    releaseDate: string;
+    description: string;
+    rating?: number;
+}
+
+export interface UpdateEpisodeInput {
+    '@assetType': 'episodes';
+    season: {
+        '@assetType': 'seasons';
+        number: number;
+        tvShow: { '@assetType': 'tvShows'; title: string };
+    };
+    episodeNumber: number;
+    title?: string;
+    releaseDate?: string;
+    description?: string;
+    rating?: number;
+}
+
+export interface CreateWatchlistInput {
+    '@assetType': 'watchlist';
+    title: string;
+    description?: string;
     tvShows?: Array<{ '@assetType': 'tvShows'; title: string }>;
 }
 
