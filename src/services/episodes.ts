@@ -21,12 +21,10 @@ export function getEpisodes(
 }
 
 export function getEpisodesBySeason(
-    seasonNumber: number,
-    tvShowTitle: string,
+    seasonKey: string,
 ): Promise<SearchResponse<Episode>> {
     return searchAssets<Episode>('episodes', {
-        'season.number': seasonNumber,
-        'season.tvShow.title': tvShowTitle,
+        'season.@key': seasonKey,
     });
 }
 
@@ -38,8 +36,11 @@ export function getEpisodeByKey(
     return readAsset<Episode>({
         '@assetType': 'episodes',
         episodeNumber,
-        'season.number': seasonNumber,
-        'season.tvShow.title': tvShowTitle,
+        season: {
+            '@assetType': 'seasons',
+            number: seasonNumber,
+            tvShow: { '@assetType': 'tvShows', title: tvShowTitle },
+        },
     });
 }
 
@@ -59,7 +60,10 @@ export function deleteEpisode(
     return deleteAsset({
         '@assetType': 'episodes',
         episodeNumber,
-        'season.number': seasonNumber,
-        'season.tvShow.title': tvShowTitle,
+        season: {
+            '@assetType': 'seasons',
+            number: seasonNumber,
+            tvShow: { '@assetType': 'tvShows', title: tvShowTitle },
+        },
     });
 }
