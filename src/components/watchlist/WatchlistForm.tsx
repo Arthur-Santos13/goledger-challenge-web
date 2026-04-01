@@ -93,8 +93,8 @@ export default function WatchlistForm({ initial, availableTvShows, onSubmit, onC
                                 <label
                                     key={tv['@key']}
                                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${checked
-                                            ? 'bg-[#e50914]/10 border border-[#e50914]/30'
-                                            : 'bg-[#2a2a2a] border border-transparent hover:border-[#444]'
+                                        ? 'bg-[#e50914]/10 border border-[#e50914]/30'
+                                        : 'bg-[#2a2a2a] border border-transparent hover:border-[#444]'
                                         }`}
                                 >
                                     <input
