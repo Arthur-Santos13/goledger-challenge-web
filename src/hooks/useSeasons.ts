@@ -5,6 +5,7 @@ import type { Season, CreateSeasonInput, UpdateSeasonInput } from '@/types';
 import {
     getSeasons,
     getSeasonsByTvShow,
+    getSeasonByKey,
     createSeason,
     updateSeason,
     deleteSeason,
@@ -80,7 +81,7 @@ export function useSeasons(filters?: Record<string, unknown>) {
     };
 }
 
-export function useSeasonsByTvShow(tvShowTitle: string) {
+export function useSeasonsByTvShow(tvShowKey: string, tvShowTitle: string) {
     const [refreshKey, setRefreshKey] = useState(0);
     const [state, setState] = useState<UseSeasonsState>({
         seasons: [],
@@ -89,11 +90,11 @@ export function useSeasonsByTvShow(tvShowTitle: string) {
     });
 
     useEffect(() => {
-        if (!tvShowTitle) return;
+        if (!tvShowKey) return;
         let cancelled = false;
         async function load() {
             try {
-                const response = await getSeasonsByTvShow(tvShowTitle);
+                const response = await getSeasonsByTvShow(tvShowKey);
                 if (!cancelled) setState({ seasons: response.result, loading: false, error: null });
             } catch (err) {
                 if (!cancelled) {
@@ -104,7 +105,7 @@ export function useSeasonsByTvShow(tvShowTitle: string) {
         }
         void load();
         return () => { cancelled = true; };
-    }, [tvShowTitle, refreshKey]);
+    }, [tvShowKey, refreshKey]);
 
     const refetch = useCallback(() => setRefreshKey((k) => k + 1), []);
 
@@ -143,4 +144,31 @@ export function useSeasonsByTvShow(tvShowTitle: string) {
         update,
         remove,
     };
+}
+
+export function useSeason(number: number, tvShowTitle: string) {
+    const [season, setSeason] = useState<Season | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!number || !tvShowTitle) return;
+        let cancelled = false;
+        async function load() {
+            try {
+                const result = await getSeasonByKey(number, tvShowTitle);
+                if (!cancelled) { setSeason(result); setLoading(false); }
+            } catch (err) {
+                if (!cancelled) {
+                    const message = err instanceof Error ? err.message : 'Failed to fetch season';
+                    setError(message);
+                    setLoading(false);
+                }
+            }
+        }
+        void load();
+        return () => { cancelled = true; };
+    }, [number, tvShowTitle]);
+
+    return { season, loading, error };
 }

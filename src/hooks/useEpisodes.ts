@@ -80,7 +80,7 @@ export function useEpisodes(filters?: Record<string, unknown>) {
     };
 }
 
-export function useEpisodesBySeason(seasonNumber: number, tvShowTitle: string) {
+export function useEpisodesBySeason(seasonKey: string, seasonNumber: number, tvShowTitle: string) {
     const [refreshKey, setRefreshKey] = useState(0);
     const [state, setState] = useState<UseEpisodesState>({
         episodes: [],
@@ -89,11 +89,11 @@ export function useEpisodesBySeason(seasonNumber: number, tvShowTitle: string) {
     });
 
     useEffect(() => {
-        if (!tvShowTitle || !seasonNumber) return;
+        if (!tvShowTitle || !seasonNumber || !seasonKey) return;
         let cancelled = false;
         async function load() {
             try {
-                const response = await getEpisodesBySeason(seasonNumber, tvShowTitle);
+                const response = await getEpisodesBySeason(seasonKey);
                 if (!cancelled) setState({ episodes: response.result, loading: false, error: null });
             } catch (err) {
                 if (!cancelled) {
@@ -104,7 +104,7 @@ export function useEpisodesBySeason(seasonNumber: number, tvShowTitle: string) {
         }
         void load();
         return () => { cancelled = true; };
-    }, [seasonNumber, tvShowTitle, refreshKey]);
+    }, [seasonKey, seasonNumber, tvShowTitle, refreshKey]);
 
     const refetch = useCallback(() => setRefreshKey((k) => k + 1), []);
 
