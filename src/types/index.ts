@@ -12,28 +12,28 @@ export interface AssetMeta {
 export interface SearchResponse<T> {
     result: T[];
     metadata: {
-        fetchedRecordsCount: number;
+        fetched_records_count: number;
         bookmark: string;
     } | null;
 }
 
 export type AssetKey = {
     '@assetType': string;
-} & Record<string, string | number>;
+} & Record<string, unknown>;
 
 // ─── Reference types (used inside assets as foreign keys) ─────────────────────
 
 export interface TvShowRef {
     '@assetType': 'tvShows';
     '@key': string;
-    title: string;
+    title?: string;  // present in inputs; NOT returned by API in ref objects
 }
 
 export interface SeasonRef {
     '@assetType': 'seasons';
     '@key': string;
-    number: number;
-    tvShow: TvShowRef;
+    number?: number;  // present in inputs; NOT returned by API in ref objects
+    tvShow?: TvShowRef;
 }
 
 // ─── Domain asset types ───────────────────────────────────────────────────────
