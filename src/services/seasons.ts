@@ -21,10 +21,10 @@ export function getSeasons(
 }
 
 export function getSeasonsByTvShow(
-    tvShowTitle: string,
+    tvShowKey: string,
 ): Promise<SearchResponse<Season>> {
     return searchAssets<Season>('seasons', {
-        'tvShow.title': tvShowTitle,
+        'tvShow.@key': tvShowKey,
     });
 }
 
@@ -35,7 +35,7 @@ export function getSeasonByKey(
     return readAsset<Season>({
         '@assetType': 'seasons',
         number,
-        tvShow: { '@assetType': 'tvShows', title: tvShowTitle } as unknown as string,
+        tvShow: { '@assetType': 'tvShows', title: tvShowTitle },
     });
 }
 
@@ -54,6 +54,6 @@ export function deleteSeason(
     return deleteAsset({
         '@assetType': 'seasons',
         number,
-        'tvShow.title': tvShowTitle,
+        tvShow: { '@assetType': 'tvShows', title: tvShowTitle },
     });
 }
