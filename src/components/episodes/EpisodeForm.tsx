@@ -26,8 +26,20 @@ export default function EpisodeForm({
     );
     const [title, setTitle] = useState(initial?.title ?? '');
     const [description, setDescription] = useState(initial?.description ?? '');
+    // Converts 'YYYY-MM-DD' → 'DD/MM/YYYY' for display
+    const toDisplay = (iso: string) => {
+        const clean = iso.slice(0, 10);
+        const [y, m, d] = clean.split('-');
+        return y && m && d ? `${d}/${m}/${y}` : '';
+    };
+    // Converts 'DD/MM/YYYY' → 'YYYY-MM-DD' for the API
+    const toIso = (display: string) => {
+        const [d, m, y] = display.split('/');
+        return y && m && d ? `${y}-${m}-${d}` : display;
+    };
+
     const [releaseDate, setReleaseDate] = useState(
-        initial?.releaseDate ? initial.releaseDate.slice(0, 10) : '',
+        initial?.releaseDate ? toDisplay(initial.releaseDate) : '',
     );
     const [rating, setRating] = useState(initial?.rating?.toString() ?? '');
     const [loading, setLoading] = useState(false);
@@ -60,7 +72,7 @@ export default function EpisodeForm({
             season: seasonRef,
             episodeNumber: epNum,
             title: title.trim(),
-            releaseDate: releaseDate || '',
+            releaseDate: releaseDate ? toIso(releaseDate) : '',
             description: description.trim(),
             ...(rating ? { rating: parseFloat(rating) } : {}),
         };
@@ -110,9 +122,17 @@ export default function EpisodeForm({
 
             <Input
                 label="Data de lançamento"
-                type="date"
+                type="text"
                 value={releaseDate}
-                onChange={(e) => setReleaseDate(e.target.value)}
+                onChange={(e) => {
+                    // Auto-insert slashes: dd/mm/yyyy
+                    let v = e.target.value.replace(/[^\d]/g, '').slice(0, 8);
+                    if (v.length >= 5) v = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4);
+                    else if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+                    setReleaseDate(v);
+                }}
+                placeholder="dd/mm/aaaa"
+                maxLength={10}
             />
 
             <Textarea

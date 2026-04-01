@@ -110,7 +110,7 @@ export default function SeasonDetailPage() {
                                 ← Voltar
                             </Button>
                             <Button size="sm" onClick={() => setCreateOpen(true)}>
-                                + Episódio
+                                + New Episode
                             </Button>
                         </div>
                     </div>
@@ -133,7 +133,7 @@ export default function SeasonDetailPage() {
                     <EmptyState
                         message="Nenhum episódio encontrado. Adicione o primeiro episódio desta temporada."
                         action={
-                            <Button onClick={() => setCreateOpen(true)}>+ Adicionar episódio</Button>
+                            <Button onClick={() => setCreateOpen(true)}>+ New Episode</Button>
                         }
                     />
                 )}
@@ -156,7 +156,7 @@ export default function SeasonDetailPage() {
             <Modal
                 open={createOpen}
                 onClose={() => setCreateOpen(false)}
-                title="Novo episódio"
+                title="New Episode"
             >
                 <EpisodeForm
                     tvShowTitle={tvShowTitle}

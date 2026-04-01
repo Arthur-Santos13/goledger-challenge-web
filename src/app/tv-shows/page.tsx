@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import type { TvShow, CreateTvShowInput, UpdateTvShowInput } from '@/types';
 import { useTvShows } from '@/hooks/useTvShows';
 import TvShowCard from '@/components/tv-shows/TvShowCard';
@@ -13,6 +14,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 
 export default function TvShowsPage() {
+    const router = useRouter();
     const { tvShows, loading, error, create, update, remove } = useTvShows();
 
     const [search, setSearch] = useState('');
@@ -31,8 +33,9 @@ export default function TvShowsPage() {
         async (data: CreateTvShowInput | UpdateTvShowInput) => {
             await create(data as CreateTvShowInput);
             setCreateOpen(false);
+            router.push(`/tv-shows/${encodeURIComponent((data as CreateTvShowInput).title)}`);
         },
-        [create],
+        [create, router],
     );
 
     const handleUpdate = useCallback(
