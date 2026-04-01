@@ -20,7 +20,10 @@ export default function TvShowDetailPage() {
     const title = decodeURIComponent(params.title as string);
 
     const { tvShow, loading: loadingShow } = useTvShow(title);
-    const { seasons, loading: loadingSeasons, create, update, remove } = useSeasonsByTvShow(title);
+    const { seasons, loading: loadingSeasons, create, update, remove } = useSeasonsByTvShow(
+        tvShow?.['@key'] ?? '',
+        title,
+    );
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<Season | null>(null);
@@ -134,6 +137,7 @@ export default function TvShowDetailPage() {
                                 <SeasonCard
                                     key={season['@key']}
                                     season={season}
+                                    tvShowTitle={tvShow.title}
                                     onEdit={setEditTarget}
                                     onDelete={setDeleteTarget}
                                 />

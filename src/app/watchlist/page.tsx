@@ -31,6 +31,12 @@ export default function WatchlistPage() {
         );
     }, [watchlists, search]);
 
+    const tvShowTitleByKey = useMemo(() => {
+        const map: Record<string, string> = {};
+        tvShows.forEach((ts) => { map[ts['@key']] = ts.title; });
+        return map;
+    }, [tvShows]);
+
     const handleCreate = useCallback(
         async (data: CreateWatchlistInput | UpdateWatchlistInput) => {
             await create(data as CreateWatchlistInput);
@@ -113,6 +119,7 @@ export default function WatchlistPage() {
                         <WatchlistCard
                             key={wl['@key']}
                             watchlist={wl}
+                            tvShowTitleByKey={tvShowTitleByKey}
                             onEdit={setEditTarget}
                             onDelete={setDeleteTarget}
                         />

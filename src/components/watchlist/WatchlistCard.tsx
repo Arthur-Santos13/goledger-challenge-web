@@ -5,11 +5,12 @@ import Button from '@/components/ui/Button';
 
 interface WatchlistCardProps {
     watchlist: Watchlist;
+    tvShowTitleByKey: Record<string, string>;
     onEdit: (watchlist: Watchlist) => void;
     onDelete: (watchlist: Watchlist) => void;
 }
 
-export default function WatchlistCard({ watchlist, onEdit, onDelete }: WatchlistCardProps) {
+export default function WatchlistCard({ watchlist, tvShowTitleByKey, onEdit, onDelete }: WatchlistCardProps) {
     const tvShowCount = watchlist.tvShows?.length ?? 0;
 
     return (
@@ -69,7 +70,7 @@ export default function WatchlistCard({ watchlist, onEdit, onDelete }: Watchlist
                             key={ts['@key']}
                             className="text-xs bg-[#2a2a2a] text-[#d4d4d4] border border-[#333] px-2 py-0.5 rounded-full"
                         >
-                            {ts.title}
+                            {tvShowTitleByKey[ts['@key']] ?? ts['@key'].split(':')[1]?.slice(0, 8)}
                         </span>
                     ))}
                 </div>
