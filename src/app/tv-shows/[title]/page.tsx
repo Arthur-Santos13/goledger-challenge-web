@@ -115,7 +115,7 @@ export default function TvShowDetailPage() {
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        Nova Temporada
+                        New Season
                     </Button>
                 </div>
 
@@ -147,7 +147,7 @@ export default function TvShowDetailPage() {
             </div>
 
             {/* Create season modal */}
-            <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Nova Temporada">
+            <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="New Season">
                 <SeasonForm
                     tvShowTitle={title}
                     onSubmit={handleCreate}
