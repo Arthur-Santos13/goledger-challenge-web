@@ -6,12 +6,12 @@ import Button from '@/components/ui/Button';
 
 interface SeasonCardProps {
     season: Season;
+    tvShowTitle: string;
     onEdit: (season: Season) => void;
     onDelete: (season: Season) => void;
 }
 
-export default function SeasonCard({ season, onEdit, onDelete }: SeasonCardProps) {
-    const tvShowTitle = season.tvShow.title;
+export default function SeasonCard({ season, tvShowTitle, onEdit, onDelete }: SeasonCardProps) {
 
     return (
         <div className="group relative bg-[#1f1f1f] rounded-lg overflow-hidden border border-[#2a2a2a] hover:border-[#808080] transition-all duration-200">
