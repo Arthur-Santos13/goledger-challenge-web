@@ -14,7 +14,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textare
             {label && (
                 <label className="text-sm font-medium text-[#b3b3b3]">
                     {label}
-                    {props.required && <span className="text-[#e50914] ml-1">*</span>}
+                    {props.required && <span className="text-[#7C3AED] ml-1">*</span>}
                 </label>
             )}
             <textarea
@@ -24,11 +24,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textare
                     bg-[#2a2a2a] border rounded px-3 py-2 text-white text-sm
                     placeholder-[#808080] outline-none transition-colors resize-none
                     focus:border-white
-                    ${error ? 'border-[#e50914]' : 'border-[#808080]'}
+                    ${error ? 'border-[#7C3AED]' : 'border-[#808080]'}
                     ${className}
                 `}
             />
-            {error && <span className="text-xs text-[#e50914]">{error}</span>}
+            {error && <span className="text-xs text-[#7C3AED]">{error}</span>}
         </div>
     );
 });

@@ -15,8 +15,8 @@ export default function EpisodeCard({ episode, onEdit, onDelete }: EpisodeCardPr
     return (
         <div className="group flex items-start gap-4 bg-[#1f1f1f] rounded-lg border border-[#2a2a2a] hover:border-[#808080] transition-all duration-200 p-4">
             {/* Episode number badge */}
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-[#e50914]/10 border border-[#e50914]/20 flex items-center justify-center">
-                <span className="text-[#e50914] font-bold text-lg leading-none">
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-[#7C3AED]/10 border border-[#7C3AED]/20 flex items-center justify-center">
+                <span className="text-[#7C3AED] font-bold text-lg leading-none">
                     {episode.episodeNumber}
                 </span>
             </div>
@@ -63,7 +63,7 @@ export default function EpisodeCard({ episode, onEdit, onDelete }: EpisodeCardPr
                     variant="ghost"
                     onClick={() => onDelete(episode)}
                     aria-label="Remover episódio"
-                    className="p-1.5 hover:text-[#e50914]"
+                    className="p-1.5 hover:text-[#7C3AED]"
                 >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

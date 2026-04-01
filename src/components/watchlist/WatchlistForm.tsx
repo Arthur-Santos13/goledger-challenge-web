@@ -93,13 +93,13 @@ export default function WatchlistForm({ initial, availableTvShows, onSubmit, onC
                                 <label
                                     key={tv['@key']}
                                     className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${checked
-                                        ? 'bg-[#e50914]/10 border border-[#e50914]/30'
+                                        ? 'bg-[#7C3AED]/10 border border-[#7C3AED]/30'
                                         : 'bg-[#2a2a2a] border border-transparent hover:border-[#444]'
                                         }`}
                                 >
                                     <input
                                         type="checkbox"
-                                        className="accent-[#e50914] w-4 h-4 flex-shrink-0"
+                                        className="accent-[#7C3AED] w-4 h-4 flex-shrink-0"
                                         checked={checked}
                                         onChange={() => toggleTvShow(tv.title)}
                                     />
@@ -112,7 +112,7 @@ export default function WatchlistForm({ initial, availableTvShows, onSubmit, onC
             </div>
 
             {error && (
-                <p className="text-sm text-[#e50914] bg-red-900/10 border border-red-900/30 rounded px-3 py-2">
+                <p className="text-sm text-[#7C3AED] bg-purple-900/10 border border-purple-900/30 rounded px-3 py-2">
                     {error}
                 </p>
             )}

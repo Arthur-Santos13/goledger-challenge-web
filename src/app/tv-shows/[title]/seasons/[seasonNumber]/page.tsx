@@ -68,7 +68,7 @@ export default function SeasonDetailPage() {
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen pt-16">
             {/* Hero */}
             <div className="bg-gradient-to-b from-[#1a1a1a] to-[#141414] px-4 sm:px-6 lg:px-8 py-12">
                 <div className="max-w-4xl mx-auto">
@@ -91,7 +91,7 @@ export default function SeasonDetailPage() {
                     <div className="flex items-end justify-between gap-4">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <span className="text-xs font-bold text-[#e50914] uppercase tracking-wider">
+                                <span className="text-xs font-bold text-[#7C3AED] uppercase tracking-wider">
                                     Temporada {seasonNumber}
                                 </span>
                             </div>
@@ -118,7 +118,7 @@ export default function SeasonDetailPage() {
             </div>
 
             {/* Content */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
                 {loading && (
                     <div className="flex justify-center py-16">
                         <LoadingSpinner size="lg" />
@@ -126,7 +126,7 @@ export default function SeasonDetailPage() {
                 )}
 
                 {error && (
-                    <p className="text-center text-[#e50914] py-8">{error}</p>
+                    <p className="text-center text-[#7C3AED] py-8">{error}</p>
                 )}
 
                 {!loading && !error && sortedEpisodes.length === 0 && (

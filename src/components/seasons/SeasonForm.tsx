@@ -78,7 +78,7 @@ export default function SeasonForm({ tvShowTitle, initial, onSubmit, onCancel }:
             />
 
             {error && (
-                <p className="text-sm text-[#e50914] bg-red-900/10 border border-red-900/30 rounded px-3 py-2">
+                <p className="text-sm text-[#7C3AED] bg-purple-900/10 border border-purple-900/30 rounded px-3 py-2">
                     {error}
                 </p>
             )}

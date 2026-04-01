@@ -16,13 +16,13 @@ export default function SeasonCard({ season, tvShowTitle, onEdit, onDelete }: Se
     return (
         <div className="group relative bg-[#1f1f1f] rounded-lg overflow-hidden border border-[#2a2a2a] hover:border-[#808080] transition-all duration-200">
             {/* Top bar */}
-            <div className="h-2 bg-gradient-to-r from-[#e50914] to-[#b20710]" />
+            <div className="h-2 bg-gradient-to-r from-[#7C3AED] to-[#5B21B6]" />
 
             <div className="p-4">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2 mb-3">
                     <div>
-                        <span className="text-xs font-bold text-[#e50914] uppercase tracking-wider">
+                        <span className="text-xs font-bold text-[#7C3AED] uppercase tracking-wider">
                             Temporada
                         </span>
                         <h3 className="text-2xl font-bold text-white leading-none mt-0.5">
@@ -60,7 +60,7 @@ export default function SeasonCard({ season, tvShowTitle, onEdit, onDelete }: Se
                         variant="ghost"
                         onClick={() => onDelete(season)}
                         aria-label="Excluir temporada"
-                        className="p-1.5 hover:text-[#e50914]"
+                        className="p-1.5 hover:text-[#7C3AED]"
                     >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
