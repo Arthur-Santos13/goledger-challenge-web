@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Episode, CreateEpisodeInput, UpdateEpisodeInput } from '@/types';
 import { useEpisodesBySeason } from '@/hooks/useEpisodes';
+import { useSeason } from '@/hooks/useSeasons';
 import EpisodeCard from '@/components/episodes/EpisodeCard';
 import EpisodeForm from '@/components/episodes/EpisodeForm';
 import Modal from '@/components/ui/Modal';
@@ -19,6 +20,8 @@ export default function SeasonDetailPage() {
     const tvShowTitle = decodeURIComponent(params.title as string);
     const seasonNumber = parseInt(params.seasonNumber as string, 10);
 
+    const { season, loading: loadingSeason } = useSeason(seasonNumber, tvShowTitle);
+
     const {
         episodes,
         loading,
@@ -26,7 +29,7 @@ export default function SeasonDetailPage() {
         create,
         update,
         remove,
-    } = useEpisodesBySeason(seasonNumber, tvShowTitle);
+    } = useEpisodesBySeason(season?.['@key'] ?? '', seasonNumber, tvShowTitle);
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<Episode | null>(null);
@@ -55,6 +58,14 @@ export default function SeasonDetailPage() {
     }, [deleteTarget, remove]);
 
     const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
+
+    if (loadingSeason) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <LoadingSpinner size="lg" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen">

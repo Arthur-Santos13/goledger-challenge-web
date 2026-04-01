@@ -17,7 +17,7 @@ export default function WatchlistForm({ initial, availableTvShows, onSubmit, onC
     const [title, setTitle] = useState(initial?.title ?? '');
     const [description, setDescription] = useState(initial?.description ?? '');
     const [selectedTitles, setSelectedTitles] = useState<Set<string>>(
-        new Set(initial?.tvShows?.map((t) => t.title) ?? []),
+        new Set((initial?.tvShows?.map((t) => t.title).filter(Boolean) ?? []) as string[]),
     );
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
