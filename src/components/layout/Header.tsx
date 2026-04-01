@@ -13,12 +13,12 @@ export default function Header() {
     const pathname = usePathname();
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/90 to-transparent backdrop-blur-sm">
+        <header className="fixed top-0 left-0 right-0 z-40 bg-[#141414]/95 backdrop-blur-sm border-b border-white/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center">
-                        <span className="text-[#e50914] font-black text-2xl tracking-tight select-none">
+                        <span className="text-[#7C3AED] font-black text-2xl tracking-tight select-none">
                             FLIXDB
                         </span>
                     </Link>
@@ -30,8 +30,8 @@ export default function Header() {
                                 key={href}
                                 href={href}
                                 className={`text-sm font-medium transition-colors duration-150 ${pathname === href
-                                        ? 'text-white'
-                                        : 'text-[#b3b3b3] hover:text-white'
+                                    ? 'text-white'
+                                    : 'text-[#b3b3b3] hover:text-white'
                                     }`}
                             >
                                 {label}

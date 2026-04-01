@@ -70,7 +70,7 @@ export default function TvShowDetailPage() {
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen pt-16">
             {/* Hero */}
             <div className="relative bg-gradient-to-b from-[#1a1a1a] to-[#141414] px-4 sm:px-6 lg:px-8 py-12">
                 <div className="max-w-7xl mx-auto">
@@ -96,7 +96,7 @@ export default function TvShowDetailPage() {
                         <div className="flex flex-col gap-2">
                             <h1 className="text-4xl font-bold text-white">{tvShow.title}</h1>
                             <div className="flex items-center gap-3 text-sm text-[#b3b3b3]">
-                                <span className="bg-[#e50914] text-white text-xs font-bold px-2 py-0.5 rounded">
+                                <span className="bg-[#7C3AED] text-white text-xs font-bold px-2 py-0.5 rounded">
                                     {tvShow.recommendedAge}+
                                 </span>
                                 <span>{seasons.length} temporada{seasons.length !== 1 ? 's' : ''}</span>
@@ -108,7 +108,7 @@ export default function TvShowDetailPage() {
             </div>
 
             {/* Seasons section */}
-            <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+            <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-white">Temporadas</h2>
                     <Button onClick={() => setCreateOpen(true)}>

@@ -123,7 +123,7 @@ export default function EpisodeForm({
                 rows={3}
             />
 
-            {error && <p className="text-[#e50914] text-sm">{error}</p>}
+            {error && <p className="text-[#7C3AED] text-sm">{error}</p>}
 
             <div className="flex justify-end gap-3 pt-2">
                 <Button type="button" variant="secondary" onClick={onCancel} disabled={loading}>

@@ -6,6 +6,15 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
 
+const AGE_OPTIONS = [
+    { value: 0, label: 'Livre' },
+    { value: 10, label: 'Maiores de 10 anos' },
+    { value: 12, label: 'Maiores de 12 anos' },
+    { value: 14, label: 'Maiores de 14 anos' },
+    { value: 16, label: 'Maiores de 16 anos' },
+    { value: 18, label: 'Maiores de 18 anos' },
+];
+
 interface TvShowFormProps {
     initial?: TvShow;
     onSubmit: (data: CreateTvShowInput | UpdateTvShowInput) => Promise<void>;
@@ -15,7 +24,7 @@ interface TvShowFormProps {
 export default function TvShowForm({ initial, onSubmit, onCancel }: TvShowFormProps) {
     const [title, setTitle] = useState(initial?.title ?? '');
     const [description, setDescription] = useState(initial?.description ?? '');
-    const [recommendedAge, setRecommendedAge] = useState(String(initial?.recommendedAge ?? ''));
+    const [recommendedAge, setRecommendedAge] = useState(String(initial?.recommendedAge ?? '0'));
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +37,7 @@ export default function TvShowForm({ initial, onSubmit, onCancel }: TvShowFormPr
             const age = Number(recommendedAge);
             if (!title.trim()) { setError('Título obrigatório'); return; }
             if (!description.trim()) { setError('Descrição obrigatória'); return; }
-            if (isNaN(age) || age < 0 || age > 18) { setError('Idade recomendada deve ser entre 0 e 18'); return; }
+            if (![0, 10, 12, 14, 16, 18].includes(age)) { setError('Selecione uma classificação etária válida'); return; }
 
             setLoading(true);
             try {
@@ -63,19 +72,24 @@ export default function TvShowForm({ initial, onSubmit, onCancel }: TvShowFormPr
                 rows={3}
                 required
             />
-            <Input
-                label="Idade recomendada"
-                type="number"
-                min={0}
-                max={18}
-                value={recommendedAge}
-                onChange={(e) => setRecommendedAge(e.target.value)}
-                placeholder="16"
-                required
-            />
+            <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-[#a0a0a0]">Classificação etária</label>
+                <select
+                    value={recommendedAge}
+                    onChange={(e) => setRecommendedAge(e.target.value)}
+                    required
+                    className="bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#7C3AED] transition-colors"
+                >
+                    {AGE_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={String(opt.value)}>
+                            {opt.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
             {error && (
-                <p className="text-sm text-[#e50914] bg-red-900/10 border border-red-900/30 rounded px-3 py-2">
+                <p className="text-sm text-[#7C3AED] bg-purple-900/10 border border-purple-900/30 rounded px-3 py-2">
                     {error}
                 </p>
             )}

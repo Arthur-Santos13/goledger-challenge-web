@@ -4,6 +4,15 @@ import Link from 'next/link';
 import type { TvShow } from '@/types';
 import Button from '@/components/ui/Button';
 
+function ageBadgeStyle(age: number): { bg: string; label: string } {
+    if (age >= 18) return { bg: 'bg-[#1a1a1a] border border-white/40', label: '18' };
+    if (age >= 16) return { bg: 'bg-red-600', label: '16' };
+    if (age >= 14) return { bg: 'bg-orange-500', label: '14' };
+    if (age >= 12) return { bg: 'bg-yellow-500', label: '12' };
+    if (age >= 10) return { bg: 'bg-sky-400', label: '10' };
+    return { bg: 'bg-green-600', label: 'L' };
+}
+
 interface TvShowCardProps {
     tvShow: TvShow;
     onEdit: (tvShow: TvShow) => void;
@@ -30,8 +39,8 @@ export default function TvShowCard({ tvShow, onEdit, onDelete }: TvShowCardProps
                 </svg>
 
                 {/* Age badge */}
-                <span className="absolute top-2 right-2 bg-[#e50914] text-white text-xs font-bold px-1.5 py-0.5 rounded">
-                    {tvShow.recommendedAge}+
+                <span className={`absolute top-2 right-2 text-white text-xs font-bold w-8 h-8 rounded-lg flex items-center justify-center ${ageBadgeStyle(tvShow.recommendedAge).bg}`}>
+                    {ageBadgeStyle(tvShow.recommendedAge).label}
                 </span>
 
                 {/* Hover actions */}
