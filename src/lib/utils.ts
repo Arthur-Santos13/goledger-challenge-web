@@ -90,6 +90,54 @@ export function formatDate(dateString: string): string {
     }
 }
 
+// ─── API error messages ───────────────────────────────────────────────────────
+
+type ApiErrorContext =
+    | { assetType: 'tvShows'; identifier?: string }
+    | { assetType: 'seasons'; identifier?: number }
+    | { assetType: 'episodes'; identifier?: number }
+    | { assetType: 'watchlist'; identifier?: string };
+
+export function parseApiError(err: unknown, context: ApiErrorContext): string {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+
+    if (status === 409) {
+        switch (context.assetType) {
+            case 'tvShows':
+                return context.identifier
+                    ? `A série "${context.identifier}" já existe`
+                    : 'Esta série já existe';
+            case 'seasons':
+                return context.identifier !== undefined
+                    ? `A temporada ${context.identifier} já existe`
+                    : 'Esta temporada já existe';
+            case 'episodes':
+                return context.identifier !== undefined
+                    ? `O episódio ${context.identifier} já existe`
+                    : 'Este episódio já existe';
+            case 'watchlist':
+                return context.identifier
+                    ? `A watchlist "${context.identifier}" já existe`
+                    : 'Esta watchlist já existe';
+        }
+    }
+
+    if (status === 404) {
+        switch (context.assetType) {
+            case 'tvShows': return 'Série não encontrada';
+            case 'seasons': return 'Temporada não encontrada';
+            case 'episodes': return 'Episódio não encontrado';
+            case 'watchlist': return 'Watchlist não encontrada';
+        }
+    }
+
+    if (status === 400) return 'Dados inválidos. Verifique os campos e tente novamente.';
+    if (status !== undefined && status >= 500) return 'Erro no servidor. Tente novamente mais tarde.';
+
+    if (err instanceof Error) return err.message;
+    return 'Erro ao salvar. Tente novamente.';
+}
+
 // ─── Pagination ───────────────────────────────────────────────────────────────
 
 /**

@@ -5,6 +5,7 @@ import type { Episode, CreateEpisodeInput, UpdateEpisodeInput } from '@/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
+import { parseApiError } from '@/lib/utils';
 
 interface EpisodeFormProps {
     tvShowTitle: string;
@@ -28,14 +29,15 @@ export default function EpisodeForm({
     const [description, setDescription] = useState(initial?.description ?? '');
     // Converts 'YYYY-MM-DD' → 'DD/MM/YYYY' for display
     const toDisplay = (iso: string) => {
-        const clean = iso.slice(0, 10);
+        const clean = iso.slice(0, 10); // works for both 'YYYY-MM-DD' and full ISO strings
         const [y, m, d] = clean.split('-');
         return y && m && d ? `${d}/${m}/${y}` : '';
     };
-    // Converts 'DD/MM/YYYY' → 'YYYY-MM-DD' for the API
+    // Converts 'DD/MM/YYYY' → ISO 8601 string (e.g. '2026-04-01T00:00:00.000Z')
     const toIso = (display: string) => {
         const [d, m, y] = display.split('/');
-        return y && m && d ? `${y}-${m}-${d}` : display;
+        if (!y || !m || !d) return display;
+        return new Date(`${y}-${m}-${d}T00:00:00.000Z`).toISOString();
     };
 
     const [releaseDate, setReleaseDate] = useState(
@@ -81,7 +83,7 @@ export default function EpisodeForm({
         try {
             await onSubmit(payload);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Erro ao salvar episódio.');
+            setError(parseApiError(err, { assetType: 'episodes', identifier: epNum }));
         } finally {
             setLoading(false);
         }

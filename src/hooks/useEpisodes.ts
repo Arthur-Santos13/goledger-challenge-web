@@ -9,6 +9,7 @@ import {
     updateEpisode,
     deleteEpisode,
 } from '@/services/episodes';
+import { getSeasons } from '@/services/seasons';
 
 interface UseEpisodesState {
     episodes: Episode[];
@@ -143,4 +144,42 @@ export function useEpisodesBySeason(seasonKey: string, seasonNumber: number, tvS
         update,
         remove,
     };
+}
+
+
+export function useTvShowAvgRating(tvShowKey: string): { avg: number | null; loading: boolean } {
+    const [avg, setAvg] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!tvShowKey) { setLoading(false); return; }
+        let cancelled = false;
+        setLoading(true);
+        // CouchDB doesn't support 2-level deep dot notation (season.tvShow.@key),
+        // so we chain: get seasons by tvShow key → episodes per season → aggregate avg.
+        getSeasons({ 'tvShow.@key': tvShowKey })
+            .then(async (seasonsRes) => {
+                if (cancelled) return;
+                const seasonKeys = seasonsRes.result.map((s) => s['@key']);
+                if (seasonKeys.length === 0) { setAvg(null); setLoading(false); return; }
+                const allEpisodes: Episode[] = [];
+                await Promise.all(
+                    seasonKeys.map((key) =>
+                        getEpisodesBySeason(key).then((r) => allEpisodes.push(...r.result)),
+                    ),
+                );
+                if (cancelled) return;
+                const rated = allEpisodes.filter((e) => e.rating != null);
+                setAvg(
+                    rated.length > 0
+                        ? rated.reduce((s, e) => s + (e.rating ?? 0), 0) / rated.length
+                        : null,
+                );
+                setLoading(false);
+            })
+            .catch(() => { if (!cancelled) { setAvg(null); setLoading(false); } });
+        return () => { cancelled = true; };
+    }, [tvShowKey]);
+
+    return { avg, loading };
 }

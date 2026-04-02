@@ -48,7 +48,7 @@ export default function TvShowsPage() {
 
     const handleDelete = useCallback(async () => {
         if (!deleteTarget) return;
-        await remove(deleteTarget.title);
+        await remove(deleteTarget.title, deleteTarget['@key']);
     }, [deleteTarget, remove]);
 
     return (

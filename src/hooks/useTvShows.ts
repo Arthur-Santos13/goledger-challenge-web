@@ -9,6 +9,9 @@ import {
     updateTvShow,
     deleteTvShow,
 } from '@/services/tvshows';
+import { getSeasonsByTvShow, deleteSeason } from '@/services/seasons';
+import { getEpisodesBySeason, deleteEpisode } from '@/services/episodes';
+import { getWatchlists, updateWatchlist } from '@/services/watchlist';
 
 interface UseTvShowsState {
     tvShows: TvShow[];
@@ -62,7 +65,36 @@ export function useTvShows(filters?: Record<string, unknown>) {
     );
 
     const remove = useCallback(
-        async (title: string): Promise<void> => {
+        async (title: string, tvShowKey: string): Promise<void> => {
+            // 1. Delete all episodes and seasons belonging to this TV show
+            const { result: seasons } = await getSeasonsByTvShow(tvShowKey);
+            for (const season of seasons) {
+                const { result: episodes } = await getEpisodesBySeason(season['@key']);
+                for (const episode of episodes) {
+                    await deleteEpisode(season.number, title, episode.episodeNumber);
+                }
+                await deleteSeason(season.number, title);
+            }
+
+            // 2. Remove this TV show from any watchlists that reference it
+            const { result: watchlists } = await getWatchlists();
+            for (const watchlist of watchlists) {
+                const refs = watchlist.tvShows ?? [];
+                if (refs.some((ref) => ref['@key'] === tvShowKey)) {
+                    await updateWatchlist({
+                        '@assetType': 'watchlist',
+                        title: watchlist.title,
+                        tvShows: refs
+                            .filter((ref) => ref['@key'] !== tvShowKey)
+                            .map((ref) => ({
+                                '@assetType': 'tvShows' as const,
+                                title: ref.title ?? ref['@key'].slice('tvShows:'.length),
+                            })),
+                    });
+                }
+            }
+
+            // 3. Delete the TV show itself
             await deleteTvShow(title);
             setRefreshKey((k) => k + 1);
         },
