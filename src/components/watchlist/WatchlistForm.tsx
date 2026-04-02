@@ -17,9 +17,11 @@ interface WatchlistFormProps {
 export default function WatchlistForm({ initial, availableTvShows, onSubmit, onCancel }: WatchlistFormProps) {
     const [title, setTitle] = useState(initial?.title ?? '');
     const [description, setDescription] = useState(initial?.description ?? '');
-    const [selectedTitles, setSelectedTitles] = useState<Set<string>>(
-        new Set((initial?.tvShows?.map((t) => t.title).filter(Boolean) ?? []) as string[]),
-    );
+    const [selectedTitles, setSelectedTitles] = useState<Set<string>>(() => {
+        if (!initial?.tvShows?.length) return new Set<string>();
+        const keys = new Set(initial.tvShows.map((t) => t['@key']));
+        return new Set(availableTvShows.filter((ts) => keys.has(ts['@key'])).map((ts) => ts.title));
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

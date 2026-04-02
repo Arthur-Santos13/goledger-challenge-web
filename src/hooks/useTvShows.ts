@@ -77,19 +77,27 @@ export function useTvShows(filters?: Record<string, unknown>) {
             }
 
             // 2. Remove this TV show from any watchlists that reference it
-            const { result: watchlists } = await getWatchlists();
+            const [{ result: watchlists }, { result: allTvShows }] = await Promise.all([
+                getWatchlists(),
+                getTvShows(undefined, 1000),
+            ]);
+            const keyToTitle: Record<string, string> = {};
+            for (const ts of allTvShows) keyToTitle[ts['@key']] = ts.title;
+
             for (const watchlist of watchlists) {
                 const refs = watchlist.tvShows ?? [];
                 if (refs.some((ref) => ref['@key'] === tvShowKey)) {
+                    const remaining = refs
+                        .filter((ref) => ref['@key'] !== tvShowKey)
+                        .filter((ref) => keyToTitle[ref['@key']] !== undefined)
+                        .map((ref) => ({
+                            '@assetType': 'tvShows' as const,
+                            title: keyToTitle[ref['@key']],
+                        }));
                     await updateWatchlist({
                         '@assetType': 'watchlist',
                         title: watchlist.title,
-                        tvShows: refs
-                            .filter((ref) => ref['@key'] !== tvShowKey)
-                            .map((ref) => ({
-                                '@assetType': 'tvShows' as const,
-                                title: ref.title ?? ref['@key'].slice('tvShows:'.length),
-                            })),
+                        tvShows: remaining,
                     });
                 }
             }
