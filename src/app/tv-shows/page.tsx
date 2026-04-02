@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TvShow, CreateTvShowInput, UpdateTvShowInput } from '@/types';
 import { useTvShows } from '@/hooks/useTvShows';
+import { getSeasons } from '@/services/seasons';
+import { getEpisodes } from '@/services/episodes';
 import TvShowCard from '@/components/tv-shows/TvShowCard';
 import TvShowForm from '@/components/tv-shows/TvShowForm';
 import Modal from '@/components/ui/Modal';
@@ -16,6 +18,41 @@ import EmptyState from '@/components/ui/EmptyState';
 export default function TvShowsPage() {
     const router = useRouter();
     const { tvShows, loading, error, create, update, remove } = useTvShows();
+
+    // Batch-fetch avg ratings: 2 fixed API calls regardless of how many shows exist
+    const [avgRatingByKey, setAvgRatingByKey] = useState<Record<string, number | null>>({});
+    useEffect(() => {
+        if (tvShows.length === 0) return;
+        let cancelled = false;
+        async function loadRatings() {
+            const [seasonsRes, episodesRes] = await Promise.all([
+                getSeasons(undefined, 1000),
+                getEpisodes(undefined, 1000),
+            ]);
+            if (cancelled) return;
+            // Map seasonKey → tvShowKey
+            const seasonToTvShow: Record<string, string> = {};
+            for (const s of seasonsRes.result) seasonToTvShow[s['@key']] = s.tvShow['@key'];
+            // Accumulate ratings per tvShowKey
+            const ratingSum: Record<string, number> = {};
+            const ratingCount: Record<string, number> = {};
+            for (const ep of episodesRes.result) {
+                if (ep.rating == null) continue;
+                const tvKey = seasonToTvShow[ep.season['@key']];
+                if (!tvKey) continue;
+                ratingSum[tvKey] = (ratingSum[tvKey] ?? 0) + ep.rating;
+                ratingCount[tvKey] = (ratingCount[tvKey] ?? 0) + 1;
+            }
+            const map: Record<string, number | null> = {};
+            for (const show of tvShows) {
+                const key = show['@key'];
+                map[key] = ratingCount[key] ? ratingSum[key] / ratingCount[key] : null;
+            }
+            setAvgRatingByKey(map);
+        }
+        void loadRatings().catch(() => { /* ratings are non-critical */ });
+        return () => { cancelled = true; };
+    }, [tvShows]);
 
     const [search, setSearch] = useState('');
     const [createOpen, setCreateOpen] = useState(false);
@@ -113,6 +150,7 @@ export default function TvShowsPage() {
                             <TvShowCard
                                 key={show['@key']}
                                 tvShow={show}
+                                avgRating={avgRatingByKey[show['@key']] ?? null}
                                 onEdit={setEditTarget}
                                 onDelete={setDeleteTarget}
                             />

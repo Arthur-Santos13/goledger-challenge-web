@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { TvShow } from '@/types';
-import { useTvShowAvgRating } from '@/hooks/useEpisodes';
 import { getPoster, setPoster } from '@/lib/posterCache';
 import { searchTvShow, posterUrl } from '@/lib/tmdb';
 import Button from '@/components/ui/Button';
@@ -20,12 +19,12 @@ function ageBadgeStyle(age: number): { bg: string; label: string } {
 
 interface TvShowCardProps {
     tvShow: TvShow;
+    avgRating: number | null;
     onEdit: (tvShow: TvShow) => void;
     onDelete: (tvShow: TvShow) => void;
 }
 
-export default function TvShowCard({ tvShow, onEdit, onDelete }: TvShowCardProps) {
-    const { avg: avgRating, loading: loadingRating } = useTvShowAvgRating(tvShow['@key']);
+export default function TvShowCard({ tvShow, avgRating, onEdit, onDelete }: TvShowCardProps) {
     const detailHref = `/tv-shows/${encodeURIComponent(tvShow.title)}`;
     // Lazy initialiser runs only on the client, so localStorage is available
     const [posterSrc, setPosterSrc] = useState<string | null>(() =>
@@ -112,9 +111,7 @@ export default function TvShowCard({ tvShow, onEdit, onDelete }: TvShowCardProps
             <Link href={detailHref} className="block p-3">
                 <div className="flex items-center justify-between gap-1 mb-0.5">
                     <h3 className="text-white font-semibold text-sm truncate">{tvShow.title}</h3>
-                    {loadingRating ? (
-                        <span className="h-3.5 w-8 rounded bg-[#3a3a3a] animate-pulse shrink-0" />
-                    ) : avgRating != null ? (
+                    {avgRating != null ? (
                         <span className="flex items-center gap-0.5 shrink-0">
                             <svg className="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
