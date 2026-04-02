@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useCallback, type FormEvent } from 'react';
+import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
 import type { TvShow, CreateTvShowInput, UpdateTvShowInput } from '@/types';
+import { searchTvShow, posterUrl, type TmdbTvResult } from '@/lib/tmdb';
+import { getPoster, setPoster, removePoster } from '@/lib/posterCache';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
+import { parseApiError } from '@/lib/utils';
 
 const AGE_OPTIONS = [
     { value: 0, label: 'Livre' },
@@ -28,7 +31,36 @@ export default function TvShowForm({ initial, onSubmit, onCancel }: TvShowFormPr
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // TMDB
+    const [tmdbResults, setTmdbResults] = useState<TmdbTvResult[]>([]);
+    const [tmdbLoading, setTmdbLoading] = useState(false);
+    const [selectedPoster, setSelectedPoster] = useState<string | null>(
+        () => (initial?.title ? getPoster(initial.title) : null)
+    );
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const isEdit = Boolean(initial);
+
+    // Auto-search TMDB when title changes (debounced 600ms), only on create
+    useEffect(() => {
+        if (isEdit) return;
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (!title.trim()) { setTmdbResults([]); return; }
+        debounceRef.current = setTimeout(async () => {
+            setTmdbLoading(true);
+            const results = await searchTvShow(title);
+            setTmdbResults(results.slice(0, 5));
+            setTmdbLoading(false);
+            // Auto-select first result if no poster chosen yet
+            if (results.length > 0 && !selectedPoster) {
+                const url = posterUrl(results[0].poster_path);
+                if (url) setSelectedPoster(url);
+                if (results[0].overview && !description) setDescription(results[0].overview);
+            }
+        }, 600);
+        return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [title, isEdit]);
 
     const handleSubmit = useCallback(
         async (e: FormEvent) => {
@@ -41,12 +73,15 @@ export default function TvShowForm({ initial, onSubmit, onCancel }: TvShowFormPr
 
             setLoading(true);
             try {
+                const tvTitle = isEdit ? initial!.title : title;
+                if (selectedPoster) setPoster(tvTitle, selectedPoster);
+                else removePoster(tvTitle);
                 const payload = isEdit
                     ? ({ '@assetType': 'tvShows', title: initial!.title, description, recommendedAge: age } as UpdateTvShowInput)
                     : ({ '@assetType': 'tvShows', title, description, recommendedAge: age } as CreateTvShowInput);
                 await onSubmit(payload);
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Erro ao salvar');
+                setError(parseApiError(err, { assetType: 'tvShows', identifier: isEdit ? initial!.title : title }));
             } finally {
                 setLoading(false);
             }
@@ -89,9 +124,50 @@ export default function TvShowForm({ initial, onSubmit, onCancel }: TvShowFormPr
             </div>
 
             {error && (
-                <p className="text-sm text-[#7C3AED] bg-purple-900/10 border border-purple-900/30 rounded px-3 py-2">
+                <p className="text-sm text-red-400 bg-red-900/10 border border-red-900/30 rounded px-3 py-2">
                     {error}
                 </p>
+            )}
+
+            {/* TMDB poster picker */}
+            {(tmdbLoading || tmdbResults.length > 0 || selectedPoster) && (
+                <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-[#a0a0a0]">
+                        Poster {tmdbLoading && <span className="text-[#606060] font-normal">buscando...</span>}
+                    </label>
+                    {/* Selected poster */}
+                    {selectedPoster && (
+                        <div className="flex items-start gap-3">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={selectedPoster} alt="Poster selecionado" className="h-28 w-20 object-cover rounded border border-[#7C3AED]" onError={() => setSelectedPoster(null)} />
+                            <button type="button" onClick={() => setSelectedPoster(null)} className="text-xs text-[#606060] hover:text-white mt-1 transition-colors">
+                                ✕ Remover
+                            </button>
+                        </div>
+                    )}
+                    {/* TMDB results row */}
+                    {tmdbResults.length > 0 && (
+                        <div className="flex gap-2 overflow-x-auto pb-1">
+                            {tmdbResults.map((r) => {
+                                const url = posterUrl(r.poster_path);
+                                if (!url) return null;
+                                const isSelected = selectedPoster === url;
+                                return (
+                                    <button
+                                        key={r.id}
+                                        type="button"
+                                        onClick={() => setSelectedPoster(isSelected ? null : url)}
+                                        className={`shrink-0 rounded overflow-hidden border-2 transition-all ${isSelected ? 'border-[#7C3AED]' : 'border-transparent hover:border-[#808080]'}`}
+                                        title={r.name}
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={url} alt={r.name} className="h-20 w-14 object-cover" />
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
             )}
 
             <div className="flex justify-end gap-3 pt-2">

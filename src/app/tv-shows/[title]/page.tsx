@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Season, CreateSeasonInput, UpdateSeasonInput } from '@/types';
 import { useTvShow } from '@/hooks/useTvShows';
 import { useSeasonsByTvShow } from '@/hooks/useSeasons';
+import { getPoster, setPoster } from '@/lib/posterCache';
+import { searchTvShow, posterUrl } from '@/lib/tmdb';
 import SeasonCard from '@/components/seasons/SeasonCard';
 import SeasonForm from '@/components/seasons/SeasonForm';
 import Modal from '@/components/ui/Modal';
@@ -25,9 +28,40 @@ export default function TvShowDetailPage() {
         title,
     );
 
+    const [posterSrc, setPosterSrc] = useState<string | null>(
+        () => typeof window !== 'undefined' ? getPoster(title) : null
+    );
+
+    useEffect(() => {
+        let cancelled = false;
+        Promise.resolve(getPoster(title)).then((cached) => {
+            if (cancelled) return;
+            if (cached) { setPosterSrc(cached); return; }
+            return searchTvShow(title).then((results) => {
+                if (cancelled) return;
+                const url = posterUrl(results[0]?.poster_path ?? null);
+                if (url) { setPoster(title, url); setPosterSrc(url); }
+            });
+        }).catch(() => { });
+        return () => { cancelled = true; };
+    }, [title]);
+
     const [createOpen, setCreateOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<Season | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Season | null>(null);
+    const [seasonAvgRatings, setSeasonAvgRatings] = useState<Record<string, number | null>>({});
+
+    const handleAvgRatingReady = useCallback((seasonKey: string, avg: number | null) => {
+        setSeasonAvgRatings((prev) => {
+            if (prev[seasonKey] === avg) return prev;
+            return { ...prev, [seasonKey]: avg };
+        });
+    }, []);
+
+    const seasonAvgs = Object.values(seasonAvgRatings).filter((v): v is number => v != null);
+    const overallAvg = seasonAvgs.length > 0
+        ? seasonAvgs.reduce((s, v) => s + v, 0) / seasonAvgs.length
+        : null;
 
     const handleCreate = useCallback(
         async (data: CreateSeasonInput | UpdateSeasonInput) => {
@@ -47,7 +81,7 @@ export default function TvShowDetailPage() {
 
     const handleDelete = useCallback(async () => {
         if (!deleteTarget) return;
-        await remove(deleteTarget.number);
+        await remove(deleteTarget.number, deleteTarget['@key']);
     }, [deleteTarget, remove]);
 
     if (loadingShow) {
@@ -86,10 +120,23 @@ export default function TvShowDetailPage() {
                     {/* Show info */}
                     <div className="flex gap-6">
                         {/* Poster */}
-                        <div className="hidden sm:flex w-32 h-48 shrink-0 bg-[#2a2a2a] rounded-lg items-center justify-center">
-                            <svg className="w-10 h-10 text-[#808080]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
-                            </svg>
+                        <div className="hidden sm:block relative w-32 h-48 shrink-0 rounded-lg overflow-hidden bg-[#2a2a2a]">
+                            {posterSrc ? (
+                                <Image
+                                    src={posterSrc}
+                                    alt={tvShow.title}
+                                    fill
+                                    sizes="128px"
+                                    className="object-cover"
+                                    onError={() => setPosterSrc(null)}
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <svg className="w-10 h-10 text-[#808080]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                                    </svg>
+                                </div>
+                            )}
                         </div>
 
                         {/* Details */}
@@ -100,6 +147,15 @@ export default function TvShowDetailPage() {
                                     {tvShow.recommendedAge}+
                                 </span>
                                 <span>{seasons.length} temporada{seasons.length !== 1 ? 's' : ''}</span>
+                                {overallAvg != null && (
+                                    <span className="flex items-center gap-1">
+                                        <svg className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        <span className="font-semibold text-white">{overallAvg.toFixed(1)}</span>
+                                        <span className="text-[#808080]">/ 10</span>
+                                    </span>
+                                )}
                             </div>
                             <p className="text-[#b3b3b3] text-sm max-w-2xl mt-2">{tvShow.description}</p>
                         </div>
@@ -140,6 +196,7 @@ export default function TvShowDetailPage() {
                                     tvShowTitle={tvShow.title}
                                     onEdit={setEditTarget}
                                     onDelete={setDeleteTarget}
+                                    onAvgRatingReady={handleAvgRatingReady}
                                 />
                             ))}
                     </div>

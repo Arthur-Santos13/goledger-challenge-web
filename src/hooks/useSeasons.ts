@@ -10,6 +10,7 @@ import {
     updateSeason,
     deleteSeason,
 } from '@/services/seasons';
+import { getEpisodesBySeason, deleteEpisode } from '@/services/episodes';
 
 interface UseSeasonsState {
     seasons: Season[];
@@ -63,7 +64,11 @@ export function useSeasons(filters?: Record<string, unknown>) {
     );
 
     const remove = useCallback(
-        async (number: number, tvShowTitle: string): Promise<void> => {
+        async (number: number, tvShowTitle: string, seasonKey: string): Promise<void> => {
+            const { result: episodes } = await getEpisodesBySeason(seasonKey);
+            for (const episode of episodes) {
+                await deleteEpisode(number, tvShowTitle, episode.episodeNumber);
+            }
             await deleteSeason(number, tvShowTitle);
             setRefreshKey((k) => k + 1);
         },
@@ -128,7 +133,11 @@ export function useSeasonsByTvShow(tvShowKey: string, tvShowTitle: string) {
     );
 
     const remove = useCallback(
-        async (number: number): Promise<void> => {
+        async (number: number, seasonKey: string): Promise<void> => {
+            const { result: episodes } = await getEpisodesBySeason(seasonKey);
+            for (const episode of episodes) {
+                await deleteEpisode(number, tvShowTitle, episode.episodeNumber);
+            }
             await deleteSeason(number, tvShowTitle);
             setRefreshKey((k) => k + 1);
         },

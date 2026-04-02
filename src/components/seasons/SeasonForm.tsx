@@ -4,6 +4,7 @@ import { useState, useCallback, type FormEvent } from 'react';
 import type { Season, CreateSeasonInput, UpdateSeasonInput } from '@/types';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import { parseApiError } from '@/lib/utils';
 
 interface SeasonFormProps {
     tvShowTitle: string;
@@ -41,7 +42,7 @@ export default function SeasonForm({ tvShowTitle, initial, onSubmit, onCancel }:
                 };
                 await onSubmit(payload);
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Erro ao salvar');
+                setError(parseApiError(err, { assetType: 'seasons', identifier: num }));
             } finally {
                 setLoading(false);
             }

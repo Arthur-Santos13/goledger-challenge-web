@@ -5,6 +5,7 @@ import type { TvShow, Watchlist, CreateWatchlistInput, UpdateWatchlistInput } fr
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
+import { parseApiError } from '@/lib/utils';
 
 interface WatchlistFormProps {
     initial?: Watchlist;
@@ -51,7 +52,7 @@ export default function WatchlistForm({ initial, availableTvShows, onSubmit, onC
                     : ({ '@assetType': 'watchlist', title, description: description || undefined, tvShows } as CreateWatchlistInput);
                 await onSubmit(payload);
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Erro ao salvar');
+                setError(parseApiError(err, { assetType: 'watchlist', identifier: isEdit ? initial!.title : title }));
             } finally {
                 setLoading(false);
             }
