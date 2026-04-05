@@ -6,6 +6,7 @@ A web interface for a blockchain-backed TV show catalogue, built as a solution f
 
 ## Table of Contents
 
+- [Live Demo](#live-demo)
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
@@ -16,6 +17,12 @@ A web interface for a blockchain-backed TV show catalogue, built as a solution f
 - [Features](#features)
 - [Architecture](#architecture)
 - [API](#api)
+
+---
+
+## Live Demo
+
+**[https://goledger-challenge-web-mys7.vercel.app](https://goledger-challenge-web-mys7.vercel.app)**
 
 ---
 
