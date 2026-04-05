@@ -67,7 +67,7 @@ export function toSeasonRef(
         '@assetType': 'seasons',
         '@key': ('@key' in season ? season['@key'] : '') as string,
         number: season.number,
-        tvShow: toTvShowRef(season.tvShow),
+        tvShow: toTvShowRef(season.tvShow ?? { '@assetType': 'tvShows' as const, title: '' }),
     };
 }
 
