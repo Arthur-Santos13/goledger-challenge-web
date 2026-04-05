@@ -62,19 +62,18 @@ cd goledger-challenge-web
 npm install
 ```
 
-3. Create a `.env.local` file at the project root with the following variables:
+3. Create a `.env.local` file from the provided example and fill in your credentials:
 
-```env
-# GoLedger API base URL (without trailing /api)
-NEXT_PUBLIC_API_URL=http://ec2-50-19-36-138.compute-1.amazonaws.com/api
-
-# Basic Auth credentials provided by email
-NEXT_PUBLIC_API_USERNAME=your_username
-NEXT_PUBLIC_API_PASSWORD=your_password
-
-# (Optional) TMDB key for automatic poster search
-NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_key
+```bash
+cp .env.example .env.local
 ```
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | Yes | GoLedger API base URL (without trailing `/api`) |
+| `NEXT_PUBLIC_API_USERNAME` | Yes | Basic Auth username provided by e-mail |
+| `NEXT_PUBLIC_API_PASSWORD` | Yes | Basic Auth password provided by e-mail |
+| `NEXT_PUBLIC_TMDB_API_KEY` | No | TMDB key for automatic poster search |
 
 > Without the TMDB key the application works normally — cards display a placeholder icon instead of a poster.
 
